@@ -1,0 +1,162 @@
+openapi: 3.0.3
+
+info:
+  title: Flask Store API
+  description: API to manage stores and items
+  version: 1.0.0
+
+paths:
+  /store:
+    get:
+      summary: Get all stores
+      responses:
+        '200':
+          description: A JSON array of stores
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreListResponse'
+    post:
+      summary: Create a new store
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreRequest'
+      responses:
+        '201':
+          description: A JSON representation of the created store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreResponse'
+
+  /store/{store_id}:
+    parameters:
+      - in: path
+        name: store_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get a store by ID
+      responses:
+        '200':
+          description: A JSON representation of a store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /store/{store_id}/item:
+    parameters:
+      - in: path
+        name: store_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      summary: Create a new item for a store
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemRequest'
+      responses:
+        '201':
+          description: A JSON representation of the created item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /store/{store_id}/items:
+    parameters:
+      - in: path
+        name: store_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get all items of a store
+      responses:
+        '200':
+          description: A JSON representation of store items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemsResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  responses:
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    StoreRequest:
+      type: object
+      properties:
+        name:
+          type: string
+    StoreResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemResponse'
+    StoreListResponse:
+      type: object
+      properties:
+        stores:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoreResponse'
+    ItemRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+    ItemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        price:
+          type: number
+    ItemsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemResponse'
